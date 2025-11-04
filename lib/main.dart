@@ -23,9 +23,37 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => servicelocator<TeacherAuthCubit>()),
       ],
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Event Attendance',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Color(0xFF667EEA),
+            brightness: Brightness.light,
+          ),
+          scaffoldBackgroundColor: Color(0xFFF5F7FA),
+          appBarTheme: AppBarTheme(
+            centerTitle: true,
+            elevation: 0,
+            backgroundColor: Color(0xFF667EEA),
+            foregroundColor: Colors.white,
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            fillColor: Colors.grey[50],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          ),
         ),
         onGenerateRoute: AppRoutes.generateroute,
         initialRoute: '/',

@@ -17,109 +17,309 @@ class StudentHomepage extends StatefulWidget {
 class _StudentHomepageState extends State<StudentHomepage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Welcome ${widget.student.name}'),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {
-              context.read<StudentAuthCubit>().signout();
-              Navigator.pushReplacementNamed(context, '/');
-            },
-            icon: Icon(Icons.logout),
+    return BlocConsumer<StudentAuthCubit, StudentAuthState>(
+      listener: (context, state) {
+      },
+      builder: (context, state) {
+        return Scaffold(
+          appBar: AppBar(
+            elevation: 0,
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                ),
+              ),
+            ),
+            title: Column(
+              children: [
+                Text(
+                  'Welcome',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white.withOpacity(0.9),
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+                Text(
+                  widget.student.name,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              Container(
+                margin: EdgeInsets.only(right: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text('Logout'),
+                        content: Text('Are you sure you want to logout?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              context.read<StudentAuthCubit>().signout();
+                              Navigator.pop(context);
+                            },
+                            child: Text('Logout', style: TextStyle(color: Colors.red)),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  icon: Icon(Icons.logout, color: Colors.white),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Quick Actions Section
-            Text(
-              'Quick Actions',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16),
-
-            // Create Event Button
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder:
-                        (context) =>
-                            CreateEventScreen(studentId: widget.student.id),
-                  ),
-                );
-              },
-              icon: Icon(Icons.add_circle_outline),
-              label: Text('Create New Event'),
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 16),
-              ),
-            ),
-            SizedBox(height: 12),
-
-            // My Events Button
-            OutlinedButton.icon(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder:
-                        (context) =>
-                            MyEventsScreen(studentId: widget.student.id),
-                  ),
-                );
-              },
-              icon: Icon(Icons.event),
-              label: Text('My Events'),
-              style: OutlinedButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 16),
-              ),
-            ),
-            SizedBox(height: 32),
-
-            // Event Categories Section
-            Text(
-              'Join Events',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16),
-
-            // Event Categories Grid
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                children: [
-                  _buildCategoryCard(
-                    context,
-                    'NCC',
-                    Colors.green,
-                    Icons.military_tech,
-                  ),
-                  _buildCategoryCard(context, 'NSS', Colors.blue, Icons.people),
-                  _buildCategoryCard(
-                    context,
-                    'Sports',
-                    Colors.orange,
-                    Icons.sports_soccer,
-                  ),
-                  _buildCategoryCard(
-                    context,
-                    'All Events',
-                    Colors.purple,
-                    Icons.all_inclusive,
-                  ),
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.grey[100]!,
+                  Colors.white,
                 ],
               ),
             ),
-          ],
+            child: Column(
+              children: [
+                // Header Section
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Event Attendance',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Manage and join events seamlessly',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                // Content
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Quick Actions Section
+                          Text(
+                            'Quick Actions',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[900],
+                            ),
+                          ),
+                          SizedBox(height: 16),
+
+                          // Create Event Card
+                          _buildActionCard(
+                            context: context,
+                            icon: Icons.add_circle_outline,
+                            title: 'Create New Event',
+                            subtitle: 'Request a new event',
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      CreateEventScreen(studentId: widget.student.id),
+                                ),
+                              );
+                            },
+                          ),
+                          SizedBox(height: 12),
+
+                          // My Events Card
+                          _buildActionCard(
+                            context: context,
+                            icon: Icons.event,
+                            title: 'My Events',
+                            subtitle: 'View your created events',
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF11998E), Color(0xFF38EF7D)],
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      MyEventsScreen(studentId: widget.student.id),
+                                ),
+                              );
+                            },
+                          ),
+                          SizedBox(height: 32),
+
+                          // Event Categories Section
+                          Text(
+                            'Browse by Category',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[900],
+                            ),
+                          ),
+                          SizedBox(height: 16),
+
+                          // Event Categories Grid
+                          GridView.count(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            children: [
+                              _buildCategoryCard(
+                                context,
+                                'NCC',
+                                Color(0xFF4CAF50),
+                                Icons.military_tech,
+                              ),
+                              _buildCategoryCard(
+                                context,
+                                'NSS',
+                                Color(0xFF2196F3),
+                                Icons.people,
+                              ),
+                              _buildCategoryCard(
+                                context,
+                                'Sports',
+                                Color(0xFFFF9800),
+                                Icons.sports_soccer,
+                              ),
+                              _buildCategoryCard(
+                                context,
+                                'All Events',
+                                Color(0xFF9C27B0),
+                                Icons.all_inclusive,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildActionCard({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Gradient gradient,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: gradient,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: gradient.colors.first.withOpacity(0.3),
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(icon, size: 28, color: Colors.white),
+                ),
+                SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -131,42 +331,69 @@ class _StudentHomepageState extends State<StudentHomepage> {
     Color color,
     IconData icon,
   ) {
-    return Card(
-      elevation: 4,
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder:
-                  (context) => EventListScreen(
-                    category: category == 'All Events' ? 'all' : category,
-                    studentId: widget.student.id,
-                    studentName: widget.student.name,
-                  ),
-            ),
-          );
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: color.withOpacity(0.1),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.2),
+            blurRadius: 12,
+            offset: Offset(0, 6),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 40, color: color),
-              SizedBox(height: 8),
-              Text(
-                category,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: color,
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EventListScreen(
+                  category: category == 'All Events' ? 'all' : category,
+                  studentId: widget.student.id,
+                  studentName: widget.student.name,
                 ),
               ),
-            ],
+            );
+          },
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: LinearGradient(
+                colors: [
+                  color.withOpacity(0.1),
+                  color.withOpacity(0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(icon, size: 32, color: color),
+                ),
+                SizedBox(height: 12),
+                Text(
+                  category,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

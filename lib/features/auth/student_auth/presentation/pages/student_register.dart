@@ -1,3 +1,4 @@
+import 'package:attend_event/core/theme/app_theme.dart';
 import 'package:attend_event/features/auth/student_auth/presentation/components/auth_student_button.dart';
 import 'package:attend_event/features/auth/student_auth/presentation/components/auth_student_field.dart';
 import 'package:attend_event/features/auth/student_auth/presentation/cubit/student_auth_cubit.dart';
@@ -19,6 +20,7 @@ class _StudentRegisterState extends State<StudentRegister> {
   final phcontroller = TextEditingController();
   final regnocontroller = TextEditingController();
   final formkey = GlobalKey<FormState>();
+  bool obscurePassword = true;
 
   void register() {
     if (formkey.currentState!.validate()) {
@@ -33,6 +35,16 @@ class _StudentRegisterState extends State<StudentRegister> {
   }
 
   @override
+  void dispose() {
+    nmcontroller.dispose();
+    emcontroller.dispose();
+    passcontroller.dispose();
+    phcontroller.dispose();
+    regnocontroller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocConsumer<StudentAuthCubit, StudentAuthState>(
       listener: (context, state) {
@@ -44,50 +56,187 @@ class _StudentRegisterState extends State<StudentRegister> {
             ),
           );
         } else if (state is StudentAuthError) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state.message)));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: AppTheme.errorColor,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
         }
       },
       builder: (context, state) {
-        if (state is StudentAuthLoading) {
-          return Center(child: CircularProgressIndicator());
-        }
+        final isLoading = state is StudentAuthLoading;
+        
         return Scaffold(
-          appBar: AppBar(title: Text('Student-register'), centerTitle: true),
-          body: Form(
-            key: formkey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                AuthStudentField(labeltext: 'Name', controller: nmcontroller),
-                SizedBox(height: 15.0),
-                AuthStudentField(labeltext: 'Email', controller: emcontroller),
-                SizedBox(height: 15.0),
-                AuthStudentField(labeltext: 'Phone', controller: phcontroller),
-                SizedBox(height: 15.0),
-                AuthStudentField(
-                  labeltext: 'Register-no',
-                  controller: regnocontroller,
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+              ),
+            ),
+            child: SafeArea(
+              child: Form(
+                key: formkey,
+                child: Column(
+                  children: [
+                    // Back Button and Title
+                    Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: IconButton(
+                              icon: Icon(Icons.arrow_back, color: Colors.white),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ),
+                          SizedBox(width: 16),
+                          Expanded(
+                            child: Text(
+                              'Create Account',
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // Form Card
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(32),
+                            topRight: Radius.circular(32),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 20,
+                              offset: Offset(0, -5),
+                            ),
+                          ],
+                        ),
+                        child: SingleChildScrollView(
+                          padding: EdgeInsets.all(24),
+                          child: Column(
+                            children: [
+                              SizedBox(height: 16),
+                              AuthStudentField(
+                                labeltext: 'Full Name',
+                                controller: nmcontroller,
+                                icon: Icons.person,
+                              ),
+                              SizedBox(height: 20),
+                              AuthStudentField(
+                                labeltext: 'Email',
+                                controller: emcontroller,
+                                icon: Icons.email,
+                                keyboardType: TextInputType.emailAddress,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter your email';
+                                  }
+                                  if (!value.contains('@')) {
+                                    return 'Please enter a valid email';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              SizedBox(height: 20),
+                              AuthStudentField(
+                                labeltext: 'Phone Number',
+                                controller: phcontroller,
+                                icon: Icons.phone,
+                                keyboardType: TextInputType.phone,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter your phone number';
+                                  }
+                                  if (value.length < 10) {
+                                    return 'Please enter a valid phone number';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              SizedBox(height: 20),
+                              AuthStudentField(
+                                labeltext: 'Registration Number',
+                                controller: regnocontroller,
+                                icon: Icons.badge,
+                              ),
+                              SizedBox(height: 20),
+                              AuthStudentField(
+                                labeltext: 'Password',
+                                controller: passcontroller,
+                                isPassword: true,
+                                obscureText: obscurePassword,
+                                onTogglePassword: () {
+                                  setState(() {
+                                    obscurePassword = !obscurePassword;
+                                  });
+                                },
+                                icon: Icons.lock,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter a password';
+                                  }
+                                  if (value.length < 6) {
+                                    return 'Password must be at least 6 characters';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              SizedBox(height: 32),
+                              AuthStudentButton(
+                                text: 'Create Account',
+                                onpressed: register,
+                                isLoading: isLoading,
+                              ),
+                              SizedBox(height: 24),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Already have an account? ',
+                                    style: TextStyle(color: Colors.grey[600]),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () => Navigator.pop(context),
+                                    child: Text(
+                                      'Login',
+                                      style: TextStyle(
+                                        color: AppTheme.primaryColor,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 24),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 15.0),
-                AuthStudentField(
-                  labeltext: 'Password',
-                  controller: passcontroller,
-                ),
-                SizedBox(height: 20.0),
-                AuthStudentButton(
-                  text: 'Register',
-                  onpressed: () {
-                    register();
-                  },
-                ),
-                SizedBox(height: 15.0),
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Text('Already have an account?.. Login'),
-                ),
-              ],
+              ),
             ),
           ),
         );
