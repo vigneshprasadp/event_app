@@ -8,7 +8,7 @@ class EventManagementScreen extends StatefulWidget {
   final Event event;
   final String hostStudentId;
 
-  const EventManagementScreen({
+  const EventManagementScreen({super.key, 
     required this.event,
     required this.hostStudentId,
   });
@@ -21,7 +21,7 @@ class _EventManagementScreenState extends State<EventManagementScreen> {
   final AttendanceRepository _attendanceRepository = AttendanceRepository(Supabase.instance.client);
   final EventRepository _eventRepository = EventRepository(Supabase.instance.client);
   
-  Map<String, Map<String, dynamic>> _studentDetails = {};
+  final Map<String, Map<String, dynamic>> _studentDetails = {};
 
   @override
   void initState() {
@@ -35,7 +35,7 @@ class _EventManagementScreenState extends State<EventManagementScreen> {
           .from('students')
           .select('id, full_name, class');
       
-      if (studentsResponse != null && studentsResponse is List) {
+      if (studentsResponse is List) {
         for (var student in studentsResponse) {
           _studentDetails[student['id']] = {
             'name': student['full_name'],

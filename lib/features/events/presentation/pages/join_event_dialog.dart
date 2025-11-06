@@ -9,7 +9,7 @@ class JoinEventDialog extends StatefulWidget {
   final String studentId;
   final String studentName;
   
-  const JoinEventDialog({
+  const JoinEventDialog({super.key, 
     required this.eventId,
     required this.studentId,
     required this.studentName,

@@ -6,7 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class TeacherRequestsScreen extends StatelessWidget {
   final String teacherId;
   
-  const TeacherRequestsScreen({required this.teacherId});
+  const TeacherRequestsScreen({super.key, required this.teacherId});
   
   @override
   Widget build(BuildContext context) {
@@ -70,7 +70,7 @@ class EventRequestCard extends StatelessWidget {
   final VoidCallback onAccept;
   final VoidCallback onReject;
   
-  const EventRequestCard({
+  const EventRequestCard({super.key, 
     required this.event,
     required this.onAccept,
     required this.onReject,
@@ -110,10 +110,10 @@ class EventRequestCard extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: onReject,
-                    child: Text('Reject'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.red,
                     ),
+                    child: Text('Reject'),
                   ),
                 ),
                 SizedBox(width: 12),

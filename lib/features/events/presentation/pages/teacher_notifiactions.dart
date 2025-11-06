@@ -5,7 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class TeacherNotificationsScreen extends StatelessWidget {
   final String teacherId;
 
-  const TeacherNotificationsScreen({required this.teacherId});
+  const TeacherNotificationsScreen({super.key, required this.teacherId});
 
   @override
   Widget build(BuildContext context) {

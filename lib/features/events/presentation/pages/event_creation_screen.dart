@@ -9,7 +9,7 @@ import 'package:uuid/uuid.dart';
 class CreateEventScreen extends StatefulWidget {
   final String studentId;
   
-  const CreateEventScreen({required this.studentId});
+  const CreateEventScreen({super.key, required this.studentId});
   
   @override
   State<CreateEventScreen> createState() => _CreateEventScreenState();
@@ -213,10 +213,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               // Submit Button
               ElevatedButton(
                 onPressed: _createEvent,
-                child: Text('Send Request to Teacher'),
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 16),
                 ),
+                child: Text('Send Request to Teacher'),
               ),
             ],
           ),

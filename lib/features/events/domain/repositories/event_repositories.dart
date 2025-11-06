@@ -15,7 +15,7 @@ class EventRepository {
           .select()
           .order('name');
 
-      if (response != null && response is List) {
+      if (response is List) {
         return response.map<Teacher>((teacherData) {
           return Teacher.fromJson(teacherData);
         }).toList();

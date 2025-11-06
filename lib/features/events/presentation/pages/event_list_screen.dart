@@ -9,7 +9,7 @@ class EventListScreen extends StatelessWidget {
   final String studentId;
   final String studentName;
   
-  const EventListScreen({
+  const EventListScreen({super.key, 
     required this.category,
     required this.studentId,
     required this.studentName,
@@ -82,7 +82,7 @@ class LiveEventCard extends StatelessWidget {
   final String studentId;
   final String studentName;
   
-  const LiveEventCard({
+  const LiveEventCard({super.key, 
     required this.event,
     required this.studentId,
     required this.studentName,
@@ -160,7 +160,7 @@ class LiveEventCard extends StatelessWidget {
                 Icon(Icons.access_time, size: 16, color: Colors.grey),
                 SizedBox(width: 4),
                 Text(
-                  '${_formatEventTime(event.scheduledFor)}',
+                  _formatEventTime(event.scheduledFor),
                   style: TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],

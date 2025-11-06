@@ -7,7 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class MyEventsScreen extends StatefulWidget {
   final String studentId;
 
-  const MyEventsScreen({required this.studentId});
+  const MyEventsScreen({super.key, required this.studentId});
 
   @override
   State<MyEventsScreen> createState() => _MyEventsScreenState();
