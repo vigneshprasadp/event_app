@@ -85,7 +85,13 @@ class _TeacherLoginPageState extends State<TeacherLoginPage> {
                             ),
                             child: IconButton(
                               icon: Icon(Icons.arrow_back, color: Colors.white),
-                              onPressed: () => Navigator.pop(context),
+                              onPressed: () {
+                                if (Navigator.canPop(context)) {
+                                  Navigator.pop(context);
+                                } else {
+                                  Navigator.pushReplacementNamed(context, '/');
+                                }
+                              },
                             ),
                           ),
                         ],

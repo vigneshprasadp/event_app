@@ -9,6 +9,8 @@ abstract interface class AuthRepositories {
     String regno,
     String name,
     String phone,
+    String year,
+    String course,
   );
 
   Future<Either<Failure, Student>> signinwithemailandpassword(
@@ -19,4 +21,5 @@ abstract interface class AuthRepositories {
   Future<Either<Failure, void>> signout();
 
   Future<Either<Failure, Student>> getcurrentuser();
+  Future<Either<Failure, void>> resetPassword(String email);
 }

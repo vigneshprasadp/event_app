@@ -7,6 +7,8 @@ class StudentModel extends Student {
     required super.email,
     required super.phone,
     required super.registerno,
+    required super.year,
+    required super.course,
   });
 
   Map<String, dynamic> tojson() {
@@ -16,6 +18,8 @@ class StudentModel extends Student {
       'email': email,
       'phone': phone,
       'register_number': registerno,
+      'year': year,
+      'course': course,
     };
   }
 
@@ -26,6 +30,8 @@ class StudentModel extends Student {
       email: map['email'] as String,
       phone: map['phone'] as String,
       registerno: map['register_number'] as String,
+      year: map['year']?.toString() ?? 'First Year',
+      course: map['course']?.toString() ?? 'BCA',
     );
   }
 }

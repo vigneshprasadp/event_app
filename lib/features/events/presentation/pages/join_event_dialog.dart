@@ -26,7 +26,7 @@ class _JoinEventDialogState extends State<JoinEventDialog> {
   String? _selectedClass;
   String? _selectedTeacherId;
   List<Teacher> _teachers = [];
-  final List<String> _classes = ['FY', 'SY', 'TY', 'Final Year'];
+  final List<String> _classes = ['First Year', 'Second Year', 'Third Year'];
   bool _isLoading = false;
   
   @override
@@ -69,7 +69,7 @@ class _JoinEventDialogState extends State<JoinEventDialog> {
         return;
       }
       
-      // Create attendance request - USING YOUR EXACT TABLE STRUCTURE
+      // Create attendance request
       await _attendanceRepository.createAttendanceRequest(
         eventId: widget.eventId,
         studentId: widget.studentId,
@@ -151,6 +151,7 @@ class _JoinEventDialogState extends State<JoinEventDialog> {
             else
               DropdownButtonFormField<String>(
                 value: _selectedTeacherId,
+                isExpanded: true, // Fix Horizontal Overflow
                 decoration: InputDecoration(
                   labelText: 'Select Reporting Teacher',
                   border: OutlineInputBorder(),
@@ -159,16 +160,13 @@ class _JoinEventDialogState extends State<JoinEventDialog> {
                 items: _teachers
                     .map((teacher) => DropdownMenuItem(
                           value: teacher.id,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(teacher.name, style: TextStyle(fontWeight: FontWeight.bold)),
-                              if (teacher.department != null)
-                                Text(
-                                  teacher.department!,
-                                  style: TextStyle(fontSize: 12, color: Colors.grey),
-                                ),
-                            ],
+                          child: Text(
+                            teacher.department != null 
+                                ? '${teacher.name} (${teacher.department})'
+                                : teacher.name,
+                            overflow: TextOverflow.ellipsis, // detailed handling
+                            maxLines: 1,
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
                           ),
                         ))
                     .toList(),

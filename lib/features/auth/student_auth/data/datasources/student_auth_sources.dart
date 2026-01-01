@@ -9,6 +9,8 @@ abstract interface class AuthDataSources {
     String regno,
     String name,
     String phone,
+    String year,
+    String course,
   );
   Future<StudentModel> signinwithemailandpassword(
     String email,
@@ -16,12 +18,22 @@ abstract interface class AuthDataSources {
   );
   Future<void> signout();
   Future<StudentModel> getcurrentuser();
+  Future<void> resetPassword(String email);
 }
 
 class AuthDatasourcesImpl implements AuthDataSources {
   final SupabaseClient supabaseClient;
 
   AuthDatasourcesImpl({required this.supabaseClient});
+
+  @override
+  Future<void> resetPassword(String email) async {
+    try {
+      await supabaseClient.auth.resetPasswordForEmail(email);
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
 
   @override
   Future<StudentModel> getcurrentuser() async {
@@ -39,13 +51,7 @@ class AuthDatasourcesImpl implements AuthDataSources {
 
     final stud = response.first;
 
-    return StudentModel(
-      id: stud['id'],
-      name: stud['name'],
-      email: stud['email'],
-      phone: stud['phone'],
-      registerno: stud['register_number'],
-    );
+    return StudentModel.fromjson(stud);
   }
 
   @override
@@ -67,13 +73,7 @@ class AuthDatasourcesImpl implements AuthDataSources {
               .select()
               .eq('id', responce.user!.id)
               .single();
-      return StudentModel(
-        id: stud['id'],
-        name: stud['name'],
-        email: stud['email'],
-        phone: stud['phone'],
-        registerno: stud['register_number'],
-      );
+      return StudentModel.fromjson(stud);
     } catch (e) {
       throw ServerException(e.toString());
     }
@@ -91,6 +91,8 @@ class AuthDatasourcesImpl implements AuthDataSources {
     String regno,
     String name,
     String phone,
+    String year,
+    String course,
   ) async {
     try {
       final responce = await supabaseClient.auth.signUp(
@@ -107,6 +109,8 @@ class AuthDatasourcesImpl implements AuthDataSources {
         email: email,
         phone: phone,
         registerno: regno,
+        year: year,
+        course: course,
       );
       final stud =
           await supabaseClient
@@ -115,13 +119,7 @@ class AuthDatasourcesImpl implements AuthDataSources {
               .select()
               .single();
 
-      return StudentModel(
-        id: stud['id'],
-        name: stud['name'],
-        email: stud['email'],
-        phone: stud['phone'],
-        registerno: stud['register_number'],
-      );
+      return StudentModel.fromjson(stud);
     } catch (e) {
       if (e.toString().contains('register_number')) {
         throw const ServerException('Register number already exists');

@@ -87,7 +87,13 @@ class _StudentLoginState extends State<StudentLogin> {
                               ),
                               child: IconButton(
                                 icon: Icon(Icons.arrow_back, color: Colors.white),
-                                onPressed: () => Navigator.pop(context),
+                                onPressed: () {
+                                  if (Navigator.canPop(context)) {
+                                    Navigator.pop(context);
+                                  } else {
+                                    Navigator.pushReplacementNamed(context, '/');
+                                  }
+                                },
                               ),
                             ),
                           ],
@@ -177,7 +183,22 @@ class _StudentLoginState extends State<StudentLogin> {
                                 },
                                 icon: Icons.lock,
                               ),
-                              SizedBox(height: 32),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  onPressed: () {
+                                    _showForgotPasswordDialog(context);
+                                  },
+                                  child: Text(
+                                    'Forgot Password?',
+                                    style: TextStyle(
+                                      color: AppTheme.primaryColor,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 24),
                               AuthStudentButton(
                                 text: 'Sign In',
                                 onpressed: login,
@@ -215,6 +236,47 @@ class _StudentLoginState extends State<StudentLogin> {
           ),
         );
       },
+    );
+  }
+  void _showForgotPasswordDialog(BuildContext context) {
+    final emailController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Reset Password'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Enter your email to receive a password reset link.'),
+            SizedBox(height: 16),
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                prefixIcon: Icon(Icons.email),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (emailController.text.isNotEmpty) {
+                context.read<StudentAuthCubit>().resetPassword(emailController.text.trim());
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Password reset link sent! Check your email.')),
+                );
+              }
+            },
+            child: Text('Send Link'),
+          ),
+        ],
+      ),
     );
   }
 }

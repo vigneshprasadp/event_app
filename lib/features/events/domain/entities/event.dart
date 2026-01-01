@@ -42,7 +42,7 @@ class Event {
       'category': category,
       'created_by': createdBy,
       'supervising_teacher_id': supervisingTeacherId,
-      'status': status, // CHANGED: Direct string
+      'status': status,
       'scheduled_for': scheduledFor.toIso8601String(),
     };
     

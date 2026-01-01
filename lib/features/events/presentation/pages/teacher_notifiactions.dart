@@ -76,8 +76,7 @@ class TeacherNotificationsScreen extends StatelessWidget {
             .where((map) => map['teacher_id'] == teacherId)
             .map((map) => Notifications.fromJson(map))
             .toList()
-          ..sort((a, b) => b.createdAt.compareTo(a.createdAt))
-        );
+          ..sort((a, b) => b.createdAt.compareTo(a.createdAt)));
   }
 
   Widget _buildNotificationCard(Notifications notification) {

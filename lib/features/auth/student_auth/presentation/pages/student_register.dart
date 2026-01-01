@@ -20,6 +20,8 @@ class _StudentRegisterState extends State<StudentRegister> {
   final phcontroller = TextEditingController();
   final regnocontroller = TextEditingController();
   final formkey = GlobalKey<FormState>();
+  String? _selectedYear;
+  String? _selectedCourse;
   bool obscurePassword = true;
 
   void register() {
@@ -30,6 +32,8 @@ class _StudentRegisterState extends State<StudentRegister> {
         password: passcontroller.text.trim(),
         phone: phcontroller.text.trim(),
         registerno: regnocontroller.text.trim(),
+        year: _selectedYear!,
+        course: _selectedCourse!,
       );
     }
   }
@@ -179,6 +183,44 @@ class _StudentRegisterState extends State<StudentRegister> {
                                 labeltext: 'Registration Number',
                                 controller: regnocontroller,
                                 icon: Icons.badge,
+                              ),
+                              SizedBox(height: 20),
+                              DropdownButtonFormField<String>(
+                                value: _selectedCourse,
+                                decoration: InputDecoration(
+                                  labelText: 'Select Course',
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                                  prefixIcon: Icon(Icons.class_outlined),
+                                  filled: true,
+                                  fillColor: Colors.grey[100],
+                                ),
+                                items: ['BCA', 'BBA', 'BCom', 'BSc', 'BA']
+                                    .map((course) => DropdownMenuItem(
+                                          value: course,
+                                          child: Text(course),
+                                        ))
+                                    .toList(),
+                                onChanged: (value) => setState(() => _selectedCourse = value),
+                                validator: (value) => value == null ? 'Please select your course' : null,
+                              ),
+                              SizedBox(height: 20),
+                              DropdownButtonFormField<String>(
+                                value: _selectedYear,
+                                decoration: InputDecoration(
+                                  labelText: 'Select Year',
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                                  prefixIcon: Icon(Icons.school_outlined),
+                                  filled: true,
+                                  fillColor: Colors.grey[100],
+                                ),
+                                items: ['First Year', 'Second Year', 'Third Year']
+                                    .map((year) => DropdownMenuItem(
+                                          value: year,
+                                          child: Text(year),
+                                        ))
+                                    .toList(),
+                                onChanged: (value) => setState(() => _selectedYear = value),
+                                validator: (value) => value == null ? 'Please select your year' : null,
                               ),
                               SizedBox(height: 20),
                               AuthStudentField(

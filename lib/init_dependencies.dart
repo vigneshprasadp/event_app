@@ -6,6 +6,7 @@ import 'package:attend_event/features/auth/student_auth/domain/usecases/cur_use_
 import 'package:attend_event/features/auth/student_auth/domain/usecases/sign_in_case.dart';
 import 'package:attend_event/features/auth/student_auth/domain/usecases/sign_out_case.dart';
 import 'package:attend_event/features/auth/student_auth/domain/usecases/sign_up_case.dart';
+import 'package:attend_event/features/auth/student_auth/domain/usecases/forgot_password_case.dart';
 import 'package:attend_event/features/auth/student_auth/presentation/cubit/student_auth_cubit.dart';
 import 'package:attend_event/features/auth/teacher_auth/data/datasources/tecaher_auth_datasorces.dart';
 import 'package:attend_event/features/auth/teacher_auth/data/repositories/teacher_auth_repositories_impl.dart';
@@ -53,12 +54,17 @@ void _studentauth() {
     () => CurUserCase(authRepositories: servicelocator<AuthRepositories>()),
   );
 
+  servicelocator.registerFactory(
+    () => ForgotPasswordCase(authRepositories: servicelocator<AuthRepositories>()),
+  );
+
   servicelocator.registerLazySingleton<StudentAuthCubit>(
     () => StudentAuthCubit(
       signUpCase: servicelocator<SignUpCase>(),
       signInCase: servicelocator<SignInCase>(),
       signOutCase: servicelocator<SignOutCase>(),
       curUserCase: servicelocator<CurUserCase>(),
+      forgotPasswordCase: servicelocator<ForgotPasswordCase>(), // Add this
     ),
   );
 }

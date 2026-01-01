@@ -16,6 +16,8 @@ class SignUpCase implements Usecase<Student, Signupparams> {
       params.registerno,
       params.name,
       params.phone,
+      params.year,
+      params.course,
     );
   }
 }
@@ -26,6 +28,8 @@ class Signupparams {
   final String password;
   final String phone;
   final String registerno;
+  final String year;
+  final String course;
 
   Signupparams({
     required this.name,
@@ -33,5 +37,7 @@ class Signupparams {
     required this.password,
     required this.phone,
     required this.registerno,
+    required this.year,
+    required this.course,
   });
 }

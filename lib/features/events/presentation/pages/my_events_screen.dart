@@ -1,8 +1,9 @@
 import 'package:attend_event/features/events/domain/entities/event.dart';
-import 'package:attend_event/features/events/domain/repositories/event_repositories.dart'; // FIXED IMPORT PATH
+import 'package:attend_event/features/events/domain/repositories/event_repositories.dart';
 import 'package:attend_event/features/notifications/presentation/event_management_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:intl/intl.dart';
 
 class MyEventsScreen extends StatefulWidget {
   final String studentId;
@@ -21,10 +22,19 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: Text('My Events'),
-        backgroundColor: Colors.blue,
+        title: Text('My Events', style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF11998E), Color(0xFF38EF7D)],
+            ),
+          ),
+        ),
         foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: StreamBuilder<List<Event>>(
         stream: _eventRepository.getStudentEvents(widget.studentId),
@@ -44,16 +54,23 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.event_busy, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
+                  Container(
+                    padding: EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.event_note_rounded, size: 60, color: Colors.grey[300]),
+                  ),
+                  SizedBox(height: 24),
                   Text(
                     'No events created yet',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey[800]),
                   ),
                   SizedBox(height: 8),
                   Text(
                     'Create your first event to get started!',
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(color: Colors.grey[600]),
                   ),
                 ],
               ),
@@ -61,6 +78,7 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
           }
 
           return ListView.builder(
+            padding: EdgeInsets.all(16),
             itemCount: events.length,
             itemBuilder: (context, index) {
               final event = events[index];
@@ -73,144 +91,218 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
   }
 
   Widget _buildEventCard(Event event) {
-    return Card(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 4,
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    Color statusColor = _getStatusColor(event.status);
+    
+    return Container(
+      margin: EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 15,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {},
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Text(
-                    event.title,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: _getStatusColor(event.status),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    event.status.toUpperCase(),
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: statusColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        event.status.toUpperCase(),
+                        style: TextStyle(
+                          color: statusColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
+                    Spacer(),
+                    IconButton(
+                        icon: Icon(Icons.delete_outline, color: Colors.red),
+                        onPressed: () => _confirmDelete(event.id!),
+                        tooltip: "Delete Event",
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            SizedBox(height: 8),
-            Text(event.description, style: TextStyle(color: Colors.grey[600])),
-            SizedBox(height: 12),
-            Row(
-              children: [
-                Chip(
-                  label: Text(
-                    event.category,
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  backgroundColor: Colors.blue,
-                ),
-                SizedBox(width: 8),
-                Icon(Icons.calendar_today, size: 16, color: Colors.grey),
-                SizedBox(width: 4),
                 Text(
                   _formatEventDate(event.scheduledFor),
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-
-            // GO LIVE BUTTON (only for approved events)
-            if (event.status == 'approved')
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () => _makeEventLive(event.id!),
-                  icon: Icon(Icons.live_tv, size: 20),
-                  label: Text('GO LIVE'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 12),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[600],
+                    fontSize: 14,
                   ),
                 ),
-              ),
-
-            // LIVE EVENT SECTION - WITH MANAGEMENT BUTTON
-            if (event.status == 'live')
-              Column(
-                children: [
-                  // Live Badge
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.green),
+                SizedBox(height: 16),
+                Text(
+                  event.title,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[900]),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  event.description,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+                SizedBox(height: 16),
+                Row(
+                  children: [
+                     Chip(
+                      label: Text(
+                        event.category,
+                        style: TextStyle(color: Colors.blue[800], fontWeight: FontWeight.bold, fontSize: 12),
+                      ),
+                      backgroundColor: Colors.blue.withOpacity(0.1),
+                      padding: EdgeInsets.zero,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                  ],
+                ),
+                
+                // Actions
+                if (event.status == 'approved' || event.status == 'live') ...[
+                  SizedBox(height: 20),
+                  Divider(),
+                  SizedBox(height: 10),
+                  if (event.status == 'approved')
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () => _makeEventLive(event, context),
+                        icon: Icon(Icons.videocam_rounded, size: 20),
+                        label: Text('GO LIVE'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          elevation: 0,
+                        ),
+                      ),
+                    ),
+                  if (event.status == 'live')
+                    Column(
                       children: [
-                        Icon(Icons.live_tv, size: 20, color: Colors.green),
-                        SizedBox(width: 8),
-                        Text(
-                          'LIVE - Students can join now!',
-                          style: TextStyle(
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold,
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EventManagementScreen(
+                                    event: event,
+                                    hostStudentId: widget.studentId,
+                                  ),
+                                ),
+                              );
+                            },
+                            icon: Icon(Icons.settings_rounded, size: 20),
+                            label: Text('Manage Event'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              elevation: 0,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                         SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: () => _confirmStop(event.id!),
+                            icon: Icon(Icons.pause_circle_outline, size: 20),
+                            label: Text('Stop Event (Pause)'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.orange,
+                              side: BorderSide(color: Colors.orange),
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                         SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () => _confirmComplete(event.id!),
+                            icon: Icon(Icons.check_circle_outline, size: 20),
+                            label: Text('End Event'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.redAccent,
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              elevation: 0,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  SizedBox(height: 12),
-
-                  // MANAGE ATTENDANCE BUTTON - PHASE 5 ENTRY POINT
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (context) => EventManagementScreen(
-                                  event: event,
-                                  hostStudentId: widget.studentId,
-                                ),
-                          ),
-                        );
-                      },
-                      icon: Icon(Icons.manage_accounts, size: 20),
-                      label: Text('Manage Attendance'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-          ],
+                ]
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
+  
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'approved': return Colors.green;
+      case 'pending': return Colors.orange;
+      case 'rejected': return Colors.red;
+      case 'live': return Colors.redAccent;
+      case 'completed': return Colors.blue;
+      default: return Colors.grey;
+    }
+  }
 
-  Future<void> _makeEventLive(String eventId) async {
+  String _formatEventDate(DateTime date) {
+    return DateFormat('MMM dd, yyyy • HH:mm').format(date);
+  }
+
+  Future<void> _makeEventLive(Event event, BuildContext context) async {
+    // Check if today is the event day
+    final now = DateTime.now();
+    final scheduled = event.scheduledFor;
+    final isSameDay = now.year == scheduled.year && 
+                      now.month == scheduled.month && 
+                      now.day == scheduled.day;
+    
+    if (!isSameDay) {
+       ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Wait! You can only go live on the scheduled day (${DateFormat('MMM d').format(scheduled)}).'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     try {
-      await _eventRepository.makeEventLive(eventId);
+      await _eventRepository.updateEventStatus(event.id!, 'live');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('🎉 Event is now live! Students can join now.'),
@@ -227,24 +319,71 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
     }
   }
 
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case 'pending':
-        return Colors.orange;
-      case 'approved':
-        return Colors.blue;
-      case 'live':
-        return Colors.green;
-      case 'rejected':
-        return Colors.red;
-      case 'completed':
-        return Colors.grey;
-      default:
-        return Colors.grey;
+  Future<void> _confirmStop(String eventId) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Stop Event?"),
+        content: Text("If you stop the event now, it will go back to pending status and require teacher approval to start again."),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text("Cancel")),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, foregroundColor: Colors.white),
+            onPressed: () => Navigator.pop(context, true), 
+            child: Text("Stop Event")
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await _eventRepository.updateEventStatus(eventId, 'pending'); // Revert to pending
+       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Event stopped. Teacher approval required to restart.")));
+    }
+  }
+  
+  Future<void> _confirmComplete(String eventId) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("End Event?"),
+        content: Text("This will mark the event as completed and remove it from the live list. Students can no longer join."),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text("Cancel")),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            onPressed: () => Navigator.pop(context, true), 
+            child: Text("End Event")
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await _eventRepository.updateEventStatus(eventId, 'completed');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Event marked as completed!")));
     }
   }
 
-  String _formatEventDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+  Future<void> _confirmDelete(String eventId) async {
+     final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Delete Event?"),
+        content: Text("Are you sure you want to delete this event? This action cannot be undone."),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text("Cancel")),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            onPressed: () => Navigator.pop(context, true), 
+            child: Text("Delete")
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await _eventRepository.deleteEvent(eventId);
+    }
   }
 }

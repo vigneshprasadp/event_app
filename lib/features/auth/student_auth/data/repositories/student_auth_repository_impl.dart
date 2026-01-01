@@ -53,6 +53,8 @@ class AuthRepositoriesImpl implements AuthRepositories {
     String regno,
     String name,
     String phone,
+    String year,
+    String course,
   ) async {
     try {
       final user = await authDataSources.signupwithemailandpassword(
@@ -61,8 +63,20 @@ class AuthRepositoriesImpl implements AuthRepositories {
         regno,
         name,
         phone,
+        year,
+        course,
       );
       return right(user);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
+  @override
+  Future<Either<Failure, void>> resetPassword(String email) async {
+    try {
+      await authDataSources.resetPassword(email);
+      // ignore: void_checks
+      return right(unit);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }

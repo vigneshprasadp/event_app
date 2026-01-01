@@ -7,6 +7,12 @@ class TeacherModel extends Teacher {
     required super.name,
     required super.email,
     required super.department,
+    super.coursesTaught,
+    super.yearsTaught,
+    super.subjectsTaught,
+    super.isHomeroomTeacher,
+    super.homeroomCourse,
+    super.homeroomYear,
   });
 
   factory TeacherModel.fromJson(Map<String, dynamic> map) {
@@ -16,6 +22,12 @@ class TeacherModel extends Teacher {
       name: map['name'],
       email: map['email'],
       department: map['department'],
+      coursesTaught: (map['courses_taught'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      yearsTaught: (map['years_taught'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      subjectsTaught: (map['subjects_taught'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      isHomeroomTeacher: map['is_homeroom_teacher'] ?? false,
+      homeroomCourse: map['homeroom_course'],
+      homeroomYear: map['homeroom_year'],
     );
   }
 }

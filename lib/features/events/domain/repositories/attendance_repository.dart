@@ -17,9 +17,20 @@ class AttendanceRepository {
       await supabase.from('attendance_requests').insert({
         'event_id': eventId,
         'student_id': studentId,
-        'student_class': studentClass,
+        'student_year': studentClass,
         'target_teacher_id': targetTeacherId,
-        'status': 'requested',
+        'status': 'pending', 
+      });
+      
+      // Create notification for the selected teacher
+      await supabase.from('notifications').insert({
+        'teacher_id': targetTeacherId, // This is where we use the param!
+        'student_id': studentId,
+        'event_id': eventId,
+        'type': 'attendance',
+        'title': 'New Join Request',
+        'body': 'A student has requested to join your event.',
+        'is_read': false,
       });
     } catch (e) {
       print('Error creating attendance request: $e');
@@ -105,7 +116,7 @@ class AttendanceRepository {
         .from('attendance_requests')
         .stream(primaryKey: ['event_id', 'student_id'])
         .map((maps) => maps
-            .where((map) => map['event_id'] == eventId && map['status'] == 'requested')
+            .where((map) => map['event_id'] == eventId && map['status'] == 'pending')
             .toList()
         );
   }

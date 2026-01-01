@@ -15,15 +15,39 @@ class EventListScreen extends StatelessWidget {
     required this.studentName,
   });
   
+  String get _title {
+    switch (category) {
+      case 'all': return 'All Events';
+      case 'NCC': return 'NCC Events';
+      case 'NSS': return 'NSS Events';
+      case 'Sports': return 'Sports Events';
+      default: return '$category Events';
+    }
+  }
+
+  Gradient get _gradient {
+    switch (category) {
+      case 'NCC': return LinearGradient(colors: [Color(0xFF11998E), Color(0xFF38EF7D)]);
+      case 'NSS': return LinearGradient(colors: [Color(0xFF667EEA), Color(0xFF764BA2)]);
+      case 'Sports': return LinearGradient(colors: [Color(0xFFFF9966), Color(0xFFFF5E62)]);
+      default: return LinearGradient(colors: [Color(0xFF6A11CB), Color(0xFF2575FC)]);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final eventRepository = EventRepository(Supabase.instance.client);
     
     return Scaffold(
+      backgroundColor: Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: Text(category == 'all' ? 'All Live Events' : '$category Events'),
-        backgroundColor: Colors.blue,
+        title: Text(_title, style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(gradient: _gradient),
+        ),
         foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: StreamBuilder<List<Event>>(
         stream: eventRepository.getLiveEventsByCategory(category),
@@ -43,16 +67,23 @@ class EventListScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.event_busy, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
+                   Container(
+                    padding: EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.event_busy_rounded, size: 64, color: Colors.grey[300]),
+                  ),
+                  SizedBox(height: 24),
                   Text(
                     'No live events available',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey[800]),
                   ),
                   SizedBox(height: 8),
                   Text(
                     'Check back later for new events',
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(color: Colors.grey[600]),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -61,6 +92,7 @@ class EventListScreen extends StatelessWidget {
           }
           
           return ListView.builder(
+            padding: EdgeInsets.all(16),
             itemCount: events.length,
             itemBuilder: (context, index) {
               final event = events[index];
@@ -101,85 +133,105 @@ class LiveEventCard extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 4,
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    return Container(
+      margin: EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 15,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {}, // Detail view maybe?
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Text(
-                    event.title,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.live_tv, color: Colors.white, size: 12),
-                      SizedBox(width: 4),
-                      Text(
-                        'LIVE',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                    ],
-                  ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.circle, size: 8, color: Colors.red),
+                          SizedBox(width: 6),
+                          Text(
+                            'LIVE',
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Spacer(),
+                    Text(
+                      _formatEventTime(event.scheduledFor),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[600],
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            SizedBox(height: 8),
-            Text(
-              event.description,
-              style: TextStyle(color: Colors.grey[600]),
-            ),
-            SizedBox(height: 12),
-            Row(
-              children: [
-                Chip(
-                  label: Text(
-                    event.category,
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  backgroundColor: Colors.blue,
-                ),
-                SizedBox(width: 8),
-                Icon(Icons.access_time, size: 16, color: Colors.grey),
-                SizedBox(width: 4),
+                SizedBox(height: 16),
                 Text(
-                  _formatEventTime(event.scheduledFor),
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                  event.title,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey[900]),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  event.description,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: Colors.grey[600], height: 1.5),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    Chip(
+                      label: Text(
+                        event.category,
+                        style: TextStyle(color: Colors.blue[800], fontWeight: FontWeight.bold),
+                      ),
+                      backgroundColor: Colors.blue.withOpacity(0.1),
+                    ),
+                    Spacer(),
+                    ElevatedButton.icon(
+                      onPressed: () => _showJoinDialog(context),
+                      icon: Icon(Icons.login_rounded, size: 20),
+                      label: Text('Join Now'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF2575FC),
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 0,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-            SizedBox(height: 16),
-            Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton.icon(
-                onPressed: () => _showJoinDialog(context),
-                icon: Icon(Icons.group_add),
-                label: Text('Join Event'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

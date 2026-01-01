@@ -33,13 +33,13 @@ class _EventManagementScreenState extends State<EventManagementScreen> {
     try {
       final studentsResponse = await Supabase.instance.client
           .from('students')
-          .select('id, full_name, class');
+          .select('id, name, course, year');
       
       if (studentsResponse is List) {
         for (var student in studentsResponse) {
           _studentDetails[student['id']] = {
-            'name': student['full_name'],
-            'class': student['class'],
+            'name': student['name'],
+            'class': '${student['course']} - ${student['year']}',
           };
         }
         setState(() {});
@@ -63,10 +63,18 @@ class _EventManagementScreenState extends State<EventManagementScreen> {
       final studentName = _getStudentName(studentId);
       final studentClass = _getStudentClass(studentId);
 
+      // We use the event's supervising teacher as the target for the notification
+      // Fallback to empty string if null, though validation should prevent this.
+      final targetTeacherId = widget.event.supervisingTeacherId ?? '';
+      
+      if (targetTeacherId.isEmpty) {
+        throw Exception("No supervising teacher found for this event.");
+      }
+
       await _attendanceRepository.markStudentPresentAndNotify(
         eventId: widget.event.id!,
         studentId: studentId,
-        targetTeacherId: request['target_teacher_id'],
+        targetTeacherId: targetTeacherId,
         studentName: studentName,
         studentClass: studentClass,
         eventTitle: widget.event.title,

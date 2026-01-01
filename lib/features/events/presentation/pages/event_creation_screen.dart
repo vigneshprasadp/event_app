@@ -145,6 +145,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               // Teacher Dropdown
               DropdownButtonFormField<String>(
                 value: _selectedTeacherId,
+                isExpanded: true, // Fix Horizontal Overflow
                 decoration: InputDecoration(
                   labelText: 'Select Teacher',
                   border: OutlineInputBorder(),
@@ -152,16 +153,13 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 items: _teachers
                     .map((teacher) => DropdownMenuItem(
                           value: teacher.id, // Using UUID from teachers table
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(teacher.name),
-                              if (teacher.department != null)
-                                Text(
-                                  teacher.department!,
-                                  style: TextStyle(fontSize: 12, color: Colors.grey),
-                                ),
-                            ],
+                          child: Text(
+                            teacher.department != null 
+                                ? '${teacher.name} (${teacher.department})'
+                                : teacher.name,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(fontWeight: FontWeight.normal),
                           ),
                         ))
                     .toList(),

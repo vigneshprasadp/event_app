@@ -4,6 +4,7 @@ import 'package:attend_event/features/auth/student_auth/domain/usecases/cur_use_
 import 'package:attend_event/features/auth/student_auth/domain/usecases/sign_in_case.dart';
 import 'package:attend_event/features/auth/student_auth/domain/usecases/sign_out_case.dart';
 import 'package:attend_event/features/auth/student_auth/domain/usecases/sign_up_case.dart';
+import 'package:attend_event/features/auth/student_auth/domain/usecases/forgot_password_case.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 part 'student_auth_state.dart';
@@ -13,12 +14,24 @@ class StudentAuthCubit extends Cubit<StudentAuthState> {
   final SignInCase signInCase;
   final SignOutCase signOutCase;
   final CurUserCase curUserCase;
+  final ForgotPasswordCase forgotPasswordCase; // Add this
+
   StudentAuthCubit({
     required this.signUpCase,
     required this.signInCase,
     required this.signOutCase,
     required this.curUserCase,
+    required this.forgotPasswordCase, // Add this
   }) : super(StudentAuthInitial());
+
+  Future<void> resetPassword(String email) async {
+    emit(StudentAuthLoading());
+    final res = await forgotPasswordCase(email);
+    res.fold(
+      (failure) => emit(StudentAuthError(message: failure.message)), // Keeping error
+      (_) => emit(StudentAuthInitial()), // Reset to initial after success (or add a SuccessState with message)
+    );
+  }
 
   Future<void> signup({
     required String name,
@@ -26,6 +39,8 @@ class StudentAuthCubit extends Cubit<StudentAuthState> {
     required String password,
     required String phone,
     required String registerno,
+    required String year,
+    required String course,
   }) async {
     emit(StudentAuthLoading());
     final res = await signUpCase(
@@ -35,6 +50,8 @@ class StudentAuthCubit extends Cubit<StudentAuthState> {
         password: password,
         phone: phone,
         registerno: registerno,
+        year: year,
+        course: course,
       ),
     );
     res.fold(
