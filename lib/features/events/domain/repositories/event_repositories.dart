@@ -10,10 +10,7 @@ class EventRepository {
   // Get all teachers for dropdown
   Future<List<Teacher>> getTeachers() async {
     try {
-      final response = await supabase
-          .from('teachers')
-          .select()
-          .order('name');
+      final response = await supabase.from('teachers').select().order('name');
 
       if (response is List) {
         return response.map<Teacher>((teacherData) {
@@ -38,13 +35,16 @@ class EventRepository {
         .from('events')
         .stream(primaryKey: ['id'])
         .order('created_at', ascending: false)
-        .map((maps) => maps
-            .where((map) => 
-                map['supervising_teacher_id'] == teacherId && 
-                map['status'] == 'pending'
-            )
-            .map((map) => Event.fromJson(map))
-            .toList()
+        .map(
+          (maps) =>
+              maps
+                  .where(
+                    (map) =>
+                        map['supervising_teacher_id'] == teacherId &&
+                        map['status'] == 'pending',
+                  )
+                  .map((map) => Event.fromJson(map))
+                  .toList(),
         );
   }
 
@@ -54,19 +54,18 @@ class EventRepository {
         .from('events')
         .stream(primaryKey: ['id'])
         .order('created_at', ascending: false)
-        .map((maps) => maps
-            .where((map) => map['created_by'] == studentId)
-            .map((map) => Event.fromJson(map))
-            .toList()
+        .map(
+          (maps) =>
+              maps
+                  .where((map) => map['created_by'] == studentId)
+                  .map((map) => Event.fromJson(map))
+                  .toList(),
         );
   }
 
   // Make event live
   Future<void> makeEventLive(String eventId) async {
-    await supabase
-        .from('events')
-        .update({'status': 'live'})
-        .eq('id', eventId);
+    await supabase.from('events').update({'status': 'live'}).eq('id', eventId);
   }
 
   // Get live events for a category
@@ -75,14 +74,17 @@ class EventRepository {
         .from('events')
         .stream(primaryKey: ['id'])
         .order('created_at', ascending: false)
-        .map((maps) => maps
-            .where((map) {
-              final isLive = map['status'] == 'live';
-              final matchesCategory = category == 'all' || map['category'] == category;
-              return isLive && matchesCategory;
-            })
-            .map((map) => Event.fromJson(map))
-            .toList()
+        .map(
+          (maps) =>
+              maps
+                  .where((map) {
+                    final isLive = map['status'] == 'live';
+                    final matchesCategory =
+                        category == 'all' || map['category'] == category;
+                    return isLive && matchesCategory;
+                  })
+                  .map((map) => Event.fromJson(map))
+                  .toList(),
         );
   }
 
@@ -92,10 +94,12 @@ class EventRepository {
         .from('events')
         .stream(primaryKey: ['id'])
         .order('scheduled_for', ascending: false)
-        .map((maps) => maps
-            .where((map) => map['supervising_teacher_id'] == teacherId)
-            .map((map) => Event.fromJson(map))
-            .toList()
+        .map(
+          (maps) =>
+              maps
+                  .where((map) => map['supervising_teacher_id'] == teacherId)
+                  .map((map) => Event.fromJson(map))
+                  .toList(),
         );
   }
 
@@ -107,10 +111,14 @@ class EventRepository {
           .from('attendance_requests')
           .select('event_id')
           .eq('target_teacher_id', teacherId);
-      
+
       if (response == null || (response as List).isEmpty) return [];
 
-      final eventIds = (response as List).map((e) => e['event_id'] as String).toSet().toList();
+      final eventIds =
+          (response as List)
+              .map((e) => e['event_id'] as String)
+              .toSet()
+              .toList();
 
       if (eventIds.isEmpty) return [];
 
@@ -120,7 +128,7 @@ class EventRepository {
           .select()
           .filter('id', 'in', eventIds)
           .order('scheduled_for', ascending: false);
-          
+
       return (eventsData as List).map((e) => Event.fromJson(e)).toList();
     } catch (e) {
       print('Error fetching targeted events: $e');
@@ -130,21 +138,19 @@ class EventRepository {
 
   // Update event status (approve/reject/stop)
   Future<void> updateEventStatus(String eventId, String status) async {
-    await supabase
-        .from('events')
-        .update({'status': status})
-        .eq('id', eventId);
+    await supabase.from('events').update({'status': status}).eq('id', eventId);
   }
 
   // Check if student successfully joined (pending or present)
   Future<bool> hasStudentJoined(String eventId, String studentId) async {
     try {
-      final response = await supabase
-          .from('attendance_requests')
-          .select('id')
-          .eq('event_id', eventId)
-          .eq('student_id', studentId)
-          .maybeSingle();
+      final response =
+          await supabase
+              .from('attendance_requests')
+              .select('id')
+              .eq('event_id', eventId)
+              .eq('student_id', studentId)
+              .maybeSingle();
       return response != null;
     } catch (e) {
       return false;
