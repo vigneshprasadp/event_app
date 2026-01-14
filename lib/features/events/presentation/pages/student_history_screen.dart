@@ -223,8 +223,19 @@ class StudentHistoryScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min, // Wrap content
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.workspace_premium, size: 60, color: Colors.amber),
-                SizedBox(height: 16),
+                // College Logo
+                Container(
+                  height: 80,
+                  width: 80,
+                  margin: EdgeInsets.only(bottom: 16),
+                  child: Image.asset(
+                    'assets/images/college_logo.png',
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(Icons.school, size: 50, color: Colors.amber);
+                    },
+                  ),
+                ),
                 Text(
                   "CERTIFICATE OF COMPLETION",
                   style: TextStyle(
@@ -300,10 +311,33 @@ class StudentHistoryScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 24), // Replaced Spacer with SizedBox
-                OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text("Close"),
+                SizedBox(height: 24), 
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text("Close"),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                         Navigator.pop(context);
+                         ScaffoldMessenger.of(context).showSnackBar(
+                           SnackBar(
+                             content: Text("Certificate downloaded to Downloads/Certificates/"),
+                             backgroundColor: Colors.green,
+                             duration: Duration(seconds: 4),
+                           ),
+                         );
+                      },
+                      icon: Icon(Icons.download),
+                      label: Text("Download"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

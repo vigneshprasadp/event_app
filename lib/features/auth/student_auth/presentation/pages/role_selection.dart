@@ -27,10 +27,10 @@ class _RoleSelectionState extends State<RoleSelection> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // App Logo/Icon
+                  // College Logo
                   Container(
-                    width: 120,
-                    height: 120,
+                    width: 140,
+                    height: 140,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
@@ -42,25 +42,56 @@ class _RoleSelectionState extends State<RoleSelection> {
                         ),
                       ],
                     ),
-                    child: Icon(
-                      Icons.event,
-                      size: 60,
-                      color: AppTheme.primaryColor,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/images/college_logo.png',
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.school_rounded,
+                              size: 60,
+                              color: AppTheme.primaryColor,
+                            );
+                          },
+                        ),
+                      ),
                     ),
                   ),
-                  SizedBox(height: 40),
+                  SizedBox(height: 32),
                   
+                  // College Name
+                  Text(
+                    'Maharani Lakshmi Ammanni\nCollege For Autonomous',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      height: 1.3,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 10,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 48),
+
                   // Welcome Text
                   Text(
                     'Welcome!',
                     style: TextStyle(
-                      fontSize: 36,
+                      fontSize: 32,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
-                      letterSpacing: -1,
+                      letterSpacing: -0.5,
                     ),
                   ),
-                  SizedBox(height: 12),
+                  SizedBox(height: 8),
                   Text(
                     'Please select your role to continue',
                     style: TextStyle(
